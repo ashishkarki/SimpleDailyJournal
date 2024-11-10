@@ -1,0 +1,29 @@
+@model SimpleDailyJournal.Models.JournalEntry
+
+<h2>Create New Journal Entry</h2>
+
+<form asp-action="Create" method="post">
+    @* Display a summary of all validation errors at the top *@
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Date" class="form-label"></label>
+        <input asp-for="Date" class="form-control"/>
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+    
+    <div class="mb-3">
+        <label asp-for="Content" class="form-label"></label>
+        <textarea asp-for="Content" class="form-control"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    
+    <div class="mb-3">
+        <label asp-for="Mood" class="form-label">Mood</label>
+        <select asp-for="Mood" class="form-control" asp-items="Html.GetEnumSelectList<MoodType>()"></select>
+        <span asp-validation-for="Mood" class="text-danger"></span>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
