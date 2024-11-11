@@ -1,0 +1,12 @@
+# Ignore build output and binaries
+bin/
+obj/
+*.dll
+*.pdb
+*.cache
+*.FileListAbsolute.txt
+*.sourcelink.json
+
+# Ignore SQLite temporary files
+*.db-shm
+*.db-wal
