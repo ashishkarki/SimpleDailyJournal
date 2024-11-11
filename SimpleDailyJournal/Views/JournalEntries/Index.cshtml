@@ -3,7 +3,8 @@
 <div class="container mt-5">
     <h2 class="mb-4">Journal Entries</h2>
 
-    <table class="table table-striped table-hover">
+    <!-- Add ID "journalTable" for DataTables initialization -->
+    <table id="journalTable" class="table table-striped table-hover">
         <thead class="table-light">
         <tr>
             <th>Date</th>
@@ -14,19 +15,19 @@
         </thead>
         
         <tbody>
-            @foreach (var entry in Model)
-            {
-                <tr>
-                    <td>@entry.Date.ToShortDateString()</td>
-                    <td>@entry.Content</td>
-                    <td>@entry.Mood</td>
-                    <td>
-                        <a class="btn btn-sm btn-primary" href="/JournalEntries/Details/@entry.Id">Details</a>
-                        <a class="btn btn-sm btn-warning" href="/JournalEntries/Edit/@entry.Id">Edit</a>
-                        <a class="btn btn-sm btn-danger" href="/JournalEntries/Delete/@entry.Id">Delete</a>
-                    </td>
-                </tr>
-            }
+        @foreach (var entry in Model)
+        {
+            <tr>
+                <td>@entry.Date.ToShortDateString()</td>
+                <td>@entry.Content</td>
+                <td>@entry.Mood</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="/JournalEntries/Details/@entry.Id">Details</a>
+                    <a class="btn btn-sm btn-warning" href="/JournalEntries/Edit/@entry.Id">Edit</a>
+                    <a class="btn btn-sm btn-danger" href="/JournalEntries/Delete/@entry.Id">Delete</a>
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
 
