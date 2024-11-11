@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleDailyJournal.Models;
 
 namespace SimpleDailyJournal.Data
 {
-    public class JournalDbContext : DbContext
+    public class JournalDbContext : IdentityDbContext<IdentityUser>
     {
         public JournalDbContext(DbContextOptions<JournalDbContext> options) : base(options)
         {
