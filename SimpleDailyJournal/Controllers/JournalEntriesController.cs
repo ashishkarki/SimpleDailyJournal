@@ -2,10 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleDailyJournal.Data;
 using Ardalis.GuardClauses;
+using Microsoft.AspNetCore.Authorization;
 using SimpleDailyJournal.Models;
 
 namespace SimpleDailyJournal.Controllers
 {
+    [Authorize]
     public class JournalEntriesController : Controller
     {
         private readonly JournalDbContext _context;

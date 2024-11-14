@@ -1,7 +1,11 @@
+using Auth0.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using SimpleDailyJournal.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// load environment variables from .env file
+DotNetEnv.Env.Load(".env");
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -10,6 +14,17 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<JournalDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// configure Auth0 authentication
+builder.Services.AddAuth0WebAppAuthentication(options =>
+{
+    options.Domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN");
+    options.ClientId = Environment.GetEnvironmentVariable("AUTH0_CLIENT_ID");
+    options.ClientSecret = Environment.GetEnvironmentVariable("AUTH0_CLIENT_SECRET");
+    options.Scope = "openid profile email";
+    options.CallbackPath = new PathString("/Account/AuthCallback");
+});
+
+// the app for any configuration
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -25,6 +40,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 /**
