@@ -34,6 +34,10 @@ namespace SimpleDailyJournal.Migrations
                     b.Property<int>("Mood")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("JournalEntries");

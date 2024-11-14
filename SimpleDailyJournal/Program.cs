@@ -10,6 +10,14 @@ DotNetEnv.Env.Load(".env");
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Register session services
+builder.Services.AddSession(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;  // Ensures session cookies are only sent over HTTPS
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // session timeout in 30 minutes
+});
+
 // Register the DbContext to use SQLite
 builder.Services.AddDbContext<JournalDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -17,8 +25,8 @@ builder.Services.AddDbContext<JournalDbContext>(options =>
 // configure Auth0 authentication
 builder.Services.AddAuth0WebAppAuthentication(options =>
 {
-    options.Domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN");
-    options.ClientId = Environment.GetEnvironmentVariable("AUTH0_CLIENT_ID");
+    options.Domain = Environment.GetEnvironmentVariable("AUTH0_DOMAIN") ?? throw new InvalidOperationException();
+    options.ClientId = Environment.GetEnvironmentVariable("AUTH0_CLIENT_ID") ?? throw new InvalidOperationException();
     options.ClientSecret = Environment.GetEnvironmentVariable("AUTH0_CLIENT_SECRET");
     options.Scope = "openid profile email";
     options.CallbackPath = new PathString("/Account/AuthCallback");
@@ -40,10 +48,13 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// enable session management
+app.UseSession();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-/**
+/*
  * Update the routing configuration so that any request to / (root) will automatically
  * be directed to the Index action of the JournalEntriesController
  */

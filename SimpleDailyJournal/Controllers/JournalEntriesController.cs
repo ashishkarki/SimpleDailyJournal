@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleDailyJournal.Data;
@@ -21,7 +22,12 @@ namespace SimpleDailyJournal.Controllers
         // GET: JournalEntries
         public async Task<IActionResult> Index()
         {
-            return View(await _context.JournalEntries.ToListAsync());
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            var userEntries = _context.JournalEntries
+                .Where(entry => entry.UserId == userId)
+                .ToListAsync();
+
+            return View(await userEntries);
         }
 
         // GET: JournalEntries/Details/5
@@ -42,11 +48,12 @@ namespace SimpleDailyJournal.Controllers
         public async Task<IActionResult> Create([Bind("Date, Content, Mood")] JournalEntry journalEntry)
         {
             if (!ModelState.IsValid) return View(journalEntry);
-            
+
+            journalEntry.UserId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value!;
             _context.Add(journalEntry);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
 
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: JournalEntries/Edit/5
@@ -68,7 +75,7 @@ namespace SimpleDailyJournal.Controllers
             }
 
             if (!ModelState.IsValid) return View(journalEntry);
-            
+
             try
             {
                 _context.Update(journalEntry);
@@ -85,7 +92,6 @@ namespace SimpleDailyJournal.Controllers
             }
 
             return RedirectToAction(nameof(Index));
-
         }
 
         // GET: JournalEntries/Delete/5
@@ -100,15 +106,15 @@ namespace SimpleDailyJournal.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var journalEntry = await _context.JournalEntries.FindAsync(id);
-            
+
             if (journalEntry == null) return RedirectToAction(nameof(Index));
-            
+
             _context.JournalEntries.Remove(journalEntry);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
-        
+
         //// Helper methods below this
         // Helper method to reduce redundancy
         private async Task<IActionResult> GetJournalEntryOrNotFound(int? id)

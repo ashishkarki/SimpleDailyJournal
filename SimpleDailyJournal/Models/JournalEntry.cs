@@ -26,5 +26,8 @@ namespace SimpleDailyJournal.Models
 
         [Required(ErrorMessage = "Mood is required.")]
         public MoodType Mood { get; set; }
+        
+        // associate an entry with a specific user
+        public string UserId { get; set; }
     }
 }
