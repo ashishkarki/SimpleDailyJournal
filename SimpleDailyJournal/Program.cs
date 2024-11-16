@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleDailyJournal.Data;
+using SimpleDailyJournal.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,8 @@ builder.Services.AddControllersWithViews();
 // Register the DbContext to use SQLite
 builder.Services.AddDbContext<JournalDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddSingleton<SentimentAnalysisService>();
 
 var app = builder.Build();
 
@@ -27,7 +30,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-/**
+/*
  * Update the routing configuration so that any request to / (root) will automatically
  * be directed to the Index action of the JournalEntriesController
  */

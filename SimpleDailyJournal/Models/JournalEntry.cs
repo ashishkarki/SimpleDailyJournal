@@ -26,5 +26,8 @@ namespace SimpleDailyJournal.Models
 
         [Required(ErrorMessage = "Mood is required.")]
         public MoodType Mood { get; set; }
+        
+        [StringLength(10, ErrorMessage = "Sentiment cannot exceed 10 characters.")]
+        public string? Sentiment { get; set; } = null;
     }
 }
