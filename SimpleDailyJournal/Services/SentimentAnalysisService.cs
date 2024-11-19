@@ -1,5 +1,6 @@
 using Microsoft.ML;
 using Microsoft.ML.Data;
+using SimpleDailyJournal.Utils;
 
 namespace SimpleDailyJournal.Services;
 
@@ -7,14 +8,6 @@ public class SentimentAnalysisService
 {
     private readonly MLContext _mlContext;
     private readonly PredictionEngine<SentimentData, SentimentPrediction> _predictionEngine;
-    
-    private readonly List<SentimentData> _sampleSentimentData =
-    [
-        new SentimentData() { Text = "I love this!", Label = true },
-        new SentimentData() { Text = "This is amazing!", Label = true },
-        new SentimentData() { Text = "I hate this.", Label = false },
-        new SentimentData() { Text = "This is terrible.", Label = false }
-    ];
 
     public SentimentAnalysisService()
     {
@@ -40,11 +33,11 @@ public class SentimentAnalysisService
 
         // Step 5: Initialize a dummy dataset
         // - An empty list to simulate the dataset structure required for pipeline initialization
-        var sampleSentimentDataView = _mlContext.Data.LoadFromEnumerable(_sampleSentimentData);
+        var trainingData = _mlContext.Data.LoadFromEnumerable(SampleData.SampleSentimentData);
 
         // Step 6: Fit the pipeline using the dummy dataset
         // - This step "trains" the pipeline with no actual data
-        var trainedPipeline = dataPipeline.Fit(sampleSentimentDataView);
+        var trainedPipeline = dataPipeline.Fit(trainingData);
 
         // Step 7: Create a prediction engine
         // - This engine lets us input new text and get sentiment predictions

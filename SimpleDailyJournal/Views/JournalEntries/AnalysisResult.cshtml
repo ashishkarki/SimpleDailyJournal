@@ -18,8 +18,12 @@
             <td>@entry.Date.ToShortDateString()</td>
             <td>@entry.Content</td>
             <td>@entry.Mood</td>
-            <td>@entry.Sentiment</td>
+            <td class="@(entry.Sentiment == "Positive" ? "text-success" : "text-danger")">
+                @entry.Sentiment
+            </td>
         </tr>
     }
     </tbody>
 </table>
+
+<a asp-action="Index" class="btn btn-secondary">Back to Journal List</a>
