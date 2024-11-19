@@ -3,16 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using SimpleDailyJournal.Data;
 using Ardalis.GuardClauses;
 using SimpleDailyJournal.Models;
+using SimpleDailyJournal.Services;
+using SimpleDailyJournal.ViewModels;
 
 namespace SimpleDailyJournal.Controllers
 {
     public class JournalEntriesController : Controller
     {
         private readonly JournalDbContext _context;
+        private readonly SentimentAnalysisService _sentimentAnalysisService;
 
-        public JournalEntriesController(JournalDbContext context)
+        public JournalEntriesController(JournalDbContext context, SentimentAnalysisService sentimentAnalysisService)
         {
             _context = context;
+            _sentimentAnalysisService = sentimentAnalysisService;
         }
 
         ////  CRUD methods below
@@ -105,6 +109,35 @@ namespace SimpleDailyJournal.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+        
+        // Analyze sentiments action
+        public IActionResult Analyze()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PerformAnalysis(DateRangeViewModel dateRange)
+        {
+            Guard.Against.Null(dateRange, nameof(dateRange));
+            
+            // fetch journal entries within the date range
+            var journalEntriesInRange = await _context.JournalEntries
+                .Where(entry => entry.Date >= dateRange.StartDate && entry.Date <= dateRange.EndDate)
+                .ToListAsync();
+            
+            // perform sentiment analysis on each entry
+            var analyzedEntries = journalEntriesInRange.Select(entry => new
+            {
+                entry.Date,
+                entry.Content,
+                entry.Mood,
+                Sentiment = _sentimentAnalysisService.PredictSentiment(entry.Content)
+            }).ToList();
+            
+            // pass analyzed data to a named view called "AnalysisResult(.cshtml)"
+            return View("AnalysisResult", analyzedEntries);
         }
         
         //// Helper methods below this

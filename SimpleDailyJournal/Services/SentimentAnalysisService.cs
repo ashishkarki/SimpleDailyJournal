@@ -7,6 +7,14 @@ public class SentimentAnalysisService
 {
     private readonly MLContext _mlContext;
     private readonly PredictionEngine<SentimentData, SentimentPrediction> _predictionEngine;
+    
+    private readonly List<SentimentData> _sampleSentimentData =
+    [
+        new SentimentData() { Text = "I love this!", Label = true },
+        new SentimentData() { Text = "This is amazing!", Label = true },
+        new SentimentData() { Text = "I hate this.", Label = false },
+        new SentimentData() { Text = "This is terrible.", Label = false }
+    ];
 
     public SentimentAnalysisService()
     {
@@ -32,11 +40,11 @@ public class SentimentAnalysisService
 
         // Step 5: Initialize a dummy dataset
         // - An empty list to simulate the dataset structure required for pipeline initialization
-        var emptyData = _mlContext.Data.LoadFromEnumerable(new List<SentimentData>());
+        var sampleSentimentDataView = _mlContext.Data.LoadFromEnumerable(_sampleSentimentData);
 
         // Step 6: Fit the pipeline using the dummy dataset
         // - This step "trains" the pipeline with no actual data
-        var trainedPipeline = dataPipeline.Fit(emptyData);
+        var trainedPipeline = dataPipeline.Fit(sampleSentimentDataView);
 
         // Step 7: Create a prediction engine
         // - This engine lets us input new text and get sentiment predictions
@@ -70,6 +78,9 @@ public class SentimentAnalysisService
 public class SentimentData
 {
     public string Text { get; set; } = string.Empty;    
+    
+    [ColumnName("Label")]
+    public bool Label { get; set; }
 }
 
 public class SentimentPrediction
