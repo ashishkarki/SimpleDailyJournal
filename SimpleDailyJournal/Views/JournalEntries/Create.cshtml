@@ -11,19 +11,19 @@
     @*     <input asp-for="Date" class="form-control"/> *@
     @*     <span asp-validation-for="Date" class="text-danger"></span> *@
     @* </div> *@
-    
+
     <div class="mb-3">
         <label asp-for="Content" class="form-label"></label>
         <textarea asp-for="Content" class="form-control"></textarea>
         <span asp-validation-for="Content" class="text-danger"></span>
     </div>
-    
+
     <div class="mb-3">
         <label asp-for="Mood" class="form-label">Mood</label>
         <select asp-for="Mood" class="form-control" asp-items="Html.GetEnumSelectList<MoodType>()"></select>
         <span asp-validation-for="Mood" class="text-danger"></span>
     </div>
-    
+
     <button type="submit" class="btn btn-primary">Create</button>
     <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </form>

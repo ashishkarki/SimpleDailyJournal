@@ -35,7 +35,7 @@ app.UseAuthorization();
  * be directed to the Index action of the JournalEntriesController
  */
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=JournalEntries}/{action=Index}/{id?}");
+    "default",
+    "{controller=JournalEntries}/{action=Index}/{id?}");
 
 app.Run();

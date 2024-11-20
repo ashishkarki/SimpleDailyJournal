@@ -17,15 +17,15 @@ public class SentimentAnalysisService
         // Step 2: Define a text featurization step
         // - Converts raw text input into numerical features for ML processing
         var textFeaturization = _mlContext.Transforms.Text.FeaturizeText(
-            outputColumnName: "Features",
-            inputColumnName: nameof(SentimentData.Text)
+            "Features",
+            nameof(SentimentData.Text)
         );
 
         // Step 3: Define the machine learning model training step
         // - This adds a binary classification trainer (Positive/Negative sentiment analysis)
         var sentimentTrainer = _mlContext.BinaryClassification.Trainers.SdcaLogisticRegression(
-            labelColumnName: "Label",
-            featureColumnName: "Features"
+            "Label",
+            "Features"
         );
 
         // Step 4: Combine the text featurization and trainer into a pipeline
@@ -45,7 +45,7 @@ public class SentimentAnalysisService
             trainedPipeline
         );
     }
-    
+
     public string PredictSentiment(string text)
     {
         // Step 1: Prepare the input data
@@ -70,10 +70,9 @@ public class SentimentAnalysisService
 
 public class SentimentData
 {
-    public string Text { get; set; } = string.Empty;    
-    
-    [ColumnName("Label")]
-    public bool Label { get; set; }
+    public string Text { get; set; } = string.Empty;
+
+    [ColumnName("Label")] public bool Label { get; set; }
 }
 
 public class SentimentPrediction
