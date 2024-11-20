@@ -1,29 +1,45 @@
 @model IEnumerable<dynamic>
 
-<h2>Anlysis Result</h2>
+<h2>Analysis Result</h2>
 
-<table class="table table-hover table-bordered">
-    <thead>
-    <tr>
-        <th>Date</th>
-        <th>Content</th>
-        <th>Mood</th>
-        <th>Sentiment</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var entry in Model)
-    {
+<!-- Display informational message -->
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-info">@ViewBag.Message</div>
+}
+
+<!-- Display warnings for skipped entries -->
+@if (ViewBag.Warning != null)
+{
+    <div class="alert alert-warning">@ViewBag.Warning</div>
+}
+
+<!-- Show table only if there are valid results -->
+@if (Model.Any())
+{
+    <table class="table table-hover table-bordered">
+        <thead>
         <tr>
-            <td>@entry.Date.ToShortDateString()</td>
-            <td>@entry.Content</td>
-            <td>@entry.Mood</td>
-            <td class="@(entry.Sentiment == "Positive" ? "text-success" : "text-danger")">
-                @entry.Sentiment
-            </td>
+            <th>Date</th>
+            <th>Content</th>
+            <th>Mood</th>
+            <th>Sentiment</th>
         </tr>
-    }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        @foreach (var entry in Model)
+        {
+            <tr>
+                <td>@entry.Date.ToShortDateString()</td>
+                <td>@entry.Content</td>
+                <td>@entry.Mood</td>
+                <td class="@(entry.Sentiment == "Positive" ? "text-success" : "text-danger")">
+                    @entry.Sentiment
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
 
 <a asp-action="Index" class="btn btn-secondary">Back to Journal List</a>

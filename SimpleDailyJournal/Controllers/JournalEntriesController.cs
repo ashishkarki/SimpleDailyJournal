@@ -127,8 +127,33 @@ namespace SimpleDailyJournal.Controllers
                 .Where(entry => entry.Date >= dateRange.StartDate && entry.Date <= dateRange.EndDate)
                 .ToListAsync();
             
+            var validEntries = journalEntriesInRange.Where(entry => !string.IsNullOrWhiteSpace(entry.Content) && entry.Content.Length > 3).ToList();
+            
+            // If there are no entries within the specified range,
+            // and those entries that are present are invalid (empty strings or very short strings),
+            // the app should gracefully handle this and show an appropriate message
+            if (validEntries.Count == 0)
+            {
+                ViewBag.Message = "No valid entries with sufficient content to analyze.";
+                return View("AnalysisResult", new List<JournalEntry>());
+            }
+            
+            // if (journalEntriesInRange.Count == 0)
+            // {
+            //     ViewBag.Message = "No journal entries found for the selected date range!!";
+            //     return View("AnalysisResult", new List<JournalEntry>());
+            // }
+            
+            // Log or store skipped entries for debugging purposes
+            var skippedEntries = journalEntriesInRange.Count - validEntries.Count;
+
+            if (skippedEntries > 0)
+            {
+                ViewBag.Warning = $"{skippedEntries} entries were too short or empty and were skipped.";
+            }
+            
             // perform sentiment analysis on each entry
-            var analyzedEntries = journalEntriesInRange.Select(entry => new
+            var analyzedEntries = validEntries.Select(entry => new
             {
                 entry.Date,
                 entry.Content,
