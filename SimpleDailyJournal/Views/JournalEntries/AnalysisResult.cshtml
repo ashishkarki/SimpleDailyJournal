@@ -48,7 +48,96 @@
         </table>
     }
 
+    <!-- Placeholder for charts -->
+    <div class="mt-5">
+        <h3 class="text-center">Sentiment Trends</h3>
+        <canvas id="sentimentChart" style="max-width: 600px; margin: 0 auto;"></canvas>
+    </div>
+
+    <div class="mt-5">
+        <h3 class="text-center">Mood Distribution</h3>
+        <canvas id="moodChart" style="max-width: 600px; margin: 0 auto;"></canvas>
+    </div>
+
+    <!-- Takes back to the Journal List page -->
     <div class="text-center mt-3">
         <a asp-action="Index" class="btn btn-secondary">Back to Journal List</a>
     </div>
 </div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Retrieve data from localStorage
+    const sentimentTrends = JSON.parse(localStorage.getItem('sentimentTrends'));
+    const moodDistribution = JSON.parse(localStorage.getItem('moodDistribution'));
+
+    // Ensure data is available
+    if (sentimentTrends && moodDistribution) {
+        // Ensure sentimentChart canvas exists
+        const sentimentCanvas = document.getElementById('sentimentChart');
+        if (sentimentCanvas) {
+            const sentimentCtx = sentimentCanvas.getContext('2d');
+            new Chart(sentimentCtx, {
+                type: 'line',
+                data: {
+                    labels: sentimentTrends.map(item => item.Date),
+                    datasets: [
+                        {
+                            label: 'Positive Sentiments',
+                            data: sentimentTrends.map(item => item.PositiveCount),
+                            borderColor: 'green',
+                            fill: false,
+                        },
+                        {
+                            label: 'Negative Sentiments',
+                            data: sentimentTrends.map(item => item.NegativeCount),
+                            borderColor: 'red',
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                    },
+                    scales: {
+                        x: { title: { display: true, text: 'Date' } },
+                        y: { title: { display: true, text: 'Count' } }
+                    }
+                }
+            });
+        } else {
+            console.warn('Sentiment chart canvas not found.');
+        }
+
+        // Ensure moodChart canvas exists
+        const moodCanvas = document.getElementById('moodChart');
+        if (moodCanvas) {
+            const moodCtx = moodCanvas.getContext('2d');
+            new Chart(moodCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(moodDistribution),
+                    datasets: [{
+                        label: 'Mood Distribution',
+                        data: Object.values(moodDistribution),
+                        backgroundColor: ['blue', 'green', 'orange', 'red', 'purple']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: true },
+                    }
+                }
+            });
+        } else {
+            console.warn('Mood chart canvas not found.');
+        }
+    } else {
+        alert('No data available to display charts.');
+        console.error('No data found for charts!');
+    }
+</script>

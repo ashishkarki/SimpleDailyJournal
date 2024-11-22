@@ -30,7 +30,7 @@
         </select>
     </div>
 
-    <button class="btn btn-primary mt-3" type="submit">Analyze</button>
+    <button class="btn btn-primary mt-3" type="button" onclick="fetchSentimentData()">Analyze</button>
 </form>
 
 <!-- Quick and easy client side date filtering using JS -->
@@ -51,6 +51,39 @@
         document.getElementById('endDate').value = formatDate(today);
         
         // also, reset the mood selection filter to "All Moods"
-        document.querySelector('[asp-for="SelectedMood"]').value = "";
+        document.getElementById('MoodFilter').value = "";
+    }
+
+    async function fetchSentimentData() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const selectedMood = document.getElementById('MoodFilter').value;
+
+        if (!startDate || !endDate) {
+            alert('Please select a valid date range!');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            alert('Start date cannot be later than end date!');
+            return;
+        }
+
+        const url = `/JournalEntries/GetSentimentTrends?startDate=${startDate}&endDate=${endDate}${selectedMood ? `&selectedMood=${selectedMood}` : ''}`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json(); // Process the JSON here
+            console.log('Received data:', data);
+            localStorage.setItem('sentimentTrends', JSON.stringify(data.sentimentTrends || []));
+            localStorage.setItem('moodDistribution', JSON.stringify(data.moodDistribution || {}));
+            window.location.href = '/JournalEntries/AnalysisResult';
+        } catch (error) {
+            console.error('Error fetching Sentiment Trends:', error);
+            alert('An error occurred while fetching sentiment data. Please try again later.');
+        }
     }
 </script>

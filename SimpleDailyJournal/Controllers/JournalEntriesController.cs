@@ -162,6 +162,50 @@ public class JournalEntriesController : Controller
         return View("AnalysisResult", analyzedEntries);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetSentimentTrends(DateTime startDate, DateTime endDate, string selectedMood = "")
+    {
+        // Validate the date range
+        if (startDate == default || endDate == default || startDate > endDate)
+        {
+            return BadRequest("Invalid date range.");
+        }
+
+        // Prepare the query
+        var entriesQuery = _context.JournalEntries.AsQueryable();
+
+        // Filter by mood if a mood is selected
+        if (!string.IsNullOrWhiteSpace(selectedMood))
+        {
+            entriesQuery = entriesQuery.Where(entry => entry.Mood.ToString() == selectedMood);
+        }
+
+        // Fetch entries within the date range
+        var entries = await entriesQuery
+            .Where(entry => entry.Date >= startDate && entry.Date <= endDate)
+            .ToListAsync();
+
+        // Group and calculate sentiment trends
+        var sentimentTrends = entries.GroupBy(entry => entry.Date.Date)
+            .Select(group => new
+            {
+                Date = group.Key.ToShortDateString(),
+                PositiveCount = group.Count(e => _sentimentAnalysisService.PredictSentiment(e.Content) == "Positive"),
+                NegativeCount = group.Count(e => _sentimentAnalysisService.PredictSentiment(e.Content) == "Negative")
+            }).ToList();
+
+        // Calculate mood distribution
+        var moodDistribution = entries.GroupBy(entry => entry.Mood.ToString())
+            .ToDictionary(group => group.Key, group => group.Count());
+
+        // Combine results and return JSON
+        return Json(new
+        {
+            sentimentTrends,
+            moodDistribution
+        });
+    }
+
     //// Helper methods below this
     // Helper method to reduce redundancy
     private async Task<IActionResult> GetJournalEntryOrNotFound(int? id)
